@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Averías Alzimatic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans flex flex-col min-h-screen sm:justify-center sm:items-center">
+
+    <div class="container w-full sm:max-w-3xl sm:mx-auto sm:p-4">
+        <div id="appContainer" class="bg-white sm:p-8 sm:rounded-lg shadow-xl">
+
+            <div id="appHeader" class="hidden mb-6 px-4 pt-4 sm:px-0 sm:pt-0">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-primary">Reportar Avería</h1>
+                    <button id="logoutButton" class="text-sm text-danger hover:underline">Cerrar Sesión</button>
+                </div>
+                <hr class="mt-2 mb-4">
+            </div>
+
+            <div id="progressBarContainer" class="w-full bg-gray-200 rounded-full h-3 mb-4 hidden mx-4 sm:mx-0 mt-2">
+                <div id="progressBar" class="bg-blue-600 h-3 rounded-full text-center text-xs font-medium text-white leading-none flex items-center justify-center" style="width: 0%">
+                    
+                </div>
+            </div>
+            <div id="loader" class="loader"></div>
+
+            <section id="loginSection" class="auth-screen active-screen">
+                <img src="https://placehold.co/150x80/0078D4/FFFFFF?text=Alzimatic" alt="Logo Alzimatic" class="mx-auto mb-4 rounded">
+                <h2 class="text-center">Bienvenido</h2>
+                <p class="text-md text-gray-600 text-center">Inicia sesión para continuar.</p>
+
+                <div id="emailPasswordLoginContainer" class="w-full max-w-sm mx-auto">
+                    <form id="loginForm">
+                        <div class="mb-4">
+                            <label for="email" class="block text-dark font-bold mb-2">USUARIO (Email):</label>
+                            <input type="email" id="email" required class="shadow-sm appearance-none border rounded-md w-full leading-tight focus:outline-none focus:ring-2 focus:ring-primary" placeholder="tu@email.com">
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="block text-dark font-bold mb-2">CONTRASEÑA:</label>
+                            <input type="password" id="password" required class="shadow-sm appearance-none border rounded-md w-full leading-tight focus:outline-none focus:ring-2 focus:ring-primary" placeholder="********">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full mt-4">ENTRAR</button>
+                        <p id="loginError" class="text-danger text-xs italic mt-2 text-center"></p>
+                    </form>
+                    <p class="text-center text-md text-gray-500 mt-3">
+                        ¿No tienes cuenta? <button id="showRegisterScreenButton" class="text-primary hover:underline font-semibold">Regístrate aquí</button>
+                    </p>
+                    <hr class="my-4 w-full">
+                    <button id="showQrLoginButton" class="btn btn-secondary w-full mb-2">Escanear QR para Iniciar Sesión</button>
+                    
+                </div>
+
+                <div id="qrLoginContainer" class="w-full max-w-sm mx-auto my-4 text-center hidden">
+                    <p class="text-gray-700 mb-2">Apunta la cámara al código QR para iniciar sesión:</p>
+                    <div id="qrReader" class="w-full bg-gray-200 rounded-md shadow-inner my-2 mx-auto" style="max-width: 400px; min-height: 250px;"></div>
+                    <p id="qrReaderStatus" class="text-sm text-gray-500 mt-2"></p>
+                    <div id="qrLoader" class="loader my-3" style="display: none;"></div>
+                    <button id="cancelQrLoginButton" class="btn btn-secondary w-full mt-3">Cancelar y Volver al Email</button>
+                </div>
+            </section>
+
+            <section id="registerSection" class="auth-screen">
+                <img src="https://placehold.co/150x80/0078D4/FFFFFF?text=Alzimatic" alt="Logo Alzimatic" class="mx-auto mb-4 rounded">
+                <h2 class="text-center">Crear Cuenta</h2>
+                <p class="text-md text-gray-600 text-center">Completa tus datos para registrarte.</p>
+                <form id="registerForm" class="w-full max-w-sm mx-auto">
+                    <div class="mb-4">
+                        <label for="registerEmail" class="block text-dark font-bold mb-2">Correo Electrónico:</label>
+                        <input type="email" id="registerEmail" required class="shadow-sm appearance-none border rounded-md w-full leading-tight focus:outline-none focus:ring-2 focus:ring-primary" placeholder="tu@email.com">
+                    </div>
+                    <div class="mb-4">
+                        <label for="registerPassword" class="block text-dark font-bold mb-2">Contraseña:</label>
+                        <input type="password" id="registerPassword" required class="shadow-sm appearance-none border rounded-md w-full leading-tight focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Mínimo 6 caracteres">
+                    </div>
+                    <button type="submit" class="btn btn-success w-full mt-4">REGISTRAR</button>
+                    <p id="registerError" class="text-danger text-xs italic mt-2 text-center"></p>
+                </form>
+                <p class="text-center text-md text-gray-500 mt-3">
+                    ¿Ya tienes cuenta? <button id="showLoginScreenButton" class="text-primary hover:underline font-semibold">Inicia sesión</button>
+                </p>
+            </section>
+
+            <div id="incidentFormContainer" class="form-screen">
+                <section id="stepSeleccionaMaquina" class="wizard-step text-center">
+                    <h2 class="mb-4">1. Selecciona la Máquina</h2>
+                    <div class="wizard-step-main-content">
+                        <div class="space-y-3 w-full">
+                            <button class="btn btn-primary btn-selection" data-value="ROYAL CASH" data-action="selectMachine" data-next-step="stepTipoIncidencia">ROYAL CASH</button>
+                            <button class="btn btn-primary btn-selection" data-value="SUPRA" data-action="selectMachine" data-next-step="stepTipoIncidencia">SUPRA</button>
+                            <button class="btn btn-primary btn-selection" data-value="POWER CASH" data-action="selectMachine" data-next-step="stepTipoIncidencia">POWER CASH</button>
+                            <button class="btn btn-primary btn-selection" data-value="MANHATAN" data-action="selectMachine" data-next-step="stepTipoIncidencia">MANHATAN</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="stepTipoIncidencia" class="wizard-step text-center">
+                    <h2 class="mb-4">2. ¿Qué Problema Tiene <span id="selectedMachineName" class="text-primary font-bold"></span>?</h2>
+                    <div class="wizard-step-main-content">
+                        <div class="space-y-3 w-full" id="listaTiposIncidencia">
+                            <button class="btn btn-primary btn-selection" data-value="MÁQUINA ENGANCHADA" data-next-step="stepSaleMensaje">MÁQUINA ENGANCHADA</button>
+                            <button class="btn btn-primary btn-selection" data-value="PANTALLA NO FUNCIONA" data-next-step="stepPantallaSuperiorInferior">PANTALLA NO FUNCIONA</button>
+                            <button class="btn btn-primary btn-selection" data-value="BILLETE ENGANCHADO" data-next-step="stepAceptaBilletes">BILLETE ENGANCHADO</button>
+                            <button class="btn btn-primary btn-selection" data-value="PASAR A RECAUDAR" data-finalize="stepFinalizarAvisoTecnico">PASAR A RECAUDAR</button>
+                            <button class="btn btn-primary btn-selection" data-value="SE HA QUEDADO VACIA PAGANDO UN PREMIO" data-next-step="stepCuantoFalta">SE HA QUEDADO VACIA PAGANDO UN PREMIO</button>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás</button>
+                    </div>
+                </section>
+
+                <section id="stepPantallaSuperiorInferior" class="wizard-step text-center">
+                    <h2 class="mb-4">Detalle: Pantalla no funciona</h2>
+                    <div class="wizard-step-main-content">
+                        <h3 class="mb-3 mt-0">¿LA PANTALLA SUPERIOR O LA INFERIOR?</h3>
+                        <div class="space-y-3 w-full">
+                            <button class="btn btn-primary btn-selection" data-value="SUPERIOR" data-next-step="stepApagarEncender">SUPERIOR</button>
+                            <button class="btn btn-primary btn-selection" data-value="INFERIOR" data-next-step="stepApagarEncender">INFERIOR</button>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás</button>
+                    </div>
+                </section>
+
+                <section id="stepSaleMensaje" class="wizard-step text-center">
+                    <h2 class="mb-4">Detalle del Problema</h2>
+                    <div class="wizard-step-main-content">
+                        <h3 class="mb-3 mt-0">¿SALE ALGÚN MENSAJE EN PANTALLA?</h3>
+                        <div class="space-y-3 w-full">
+                            <button class="btn btn-primary btn-selection" data-value="SI" data-next-step="stepApagarEncender">SÍ</button>
+                            <button class="btn btn-secondary btn-selection" data-value="NO" data-next-step="stepApagarEncender">NO</button>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás</button>
+                    </div>
+                </section>
+
+                <section id="stepApagarEncender" class="wizard-step text-center">
+                    <h2 class="mb-4">Sugerencia</h2>
+                    <div class="wizard-step-main-content">
+                        <h3 class="mb-3 mt-0">¿HA PROBADO A APAGAR Y ENCENDER?</h3>
+                         <div class="space-y-3 w-full">
+                            <button class="btn btn-primary btn-selection" data-value="SI, PERO SIGUE IGUAL" data-next-step="stepComprobarFunciona">SÍ, PERO SIGUE IGUAL</button>
+                            <button class="btn btn-secondary btn-selection" data-value="AHORA PRUEBO" data-next-step="stepComprobarFunciona_despues_de_probar">AHORA PRUEBO</button>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás</button>
+                    </div>
+                </section>
+
+                <section id="stepAceptaBilletes" class="wizard-step text-center">
+                    <h2 class="mb-4">Detalle: Billete Enganchado</h2>
+                    <div class="wizard-step-main-content">
+                        <h3 class="mb-3 mt-0">¿ACEPTA BILLETES?</h3>
+                        <div class="space-y-3 w-full">
+                            <button class="btn btn-primary btn-selection" data-value="SI" data-finalize="stepFinalizarTecnicoVerifica">SÍ</button>
+                            <button class="btn btn-secondary btn-selection" data-value="NO HE PROBADO" data-next-step="stepComprobarFunciona_despues_de_probar">NO HE PROBADO</button>
+                            <button class="btn btn-danger btn-selection" data-value="NO" data-finalize="stepFinalizarAvisoTecnico">NO</button>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás</button>
+                    </div>
+                </section>
+
+                <section id="stepQuitarConLlave" class="wizard-step text-center">
+                     <h2 class="mb-4">Sugerencia</h2>
+                    <div class="wizard-step-main-content">
+                        <h3 class="mb-3 mt-0">¿HA PROBADO A QUITARLO CON LA LLAVE?</h3>
+                         <div class="space-y-3 w-full">
+                            <button class="btn btn-primary btn-selection" data-value="SI, Y NO SE QUITA" data-next-step="stepComprobarFunciona">SÍ, Y NO SE QUITA</button>
+                            <button class="btn btn-danger btn-selection" data-value="NO TENGO LLAVE" data-finalize="stepFinalizarAvisoTecnico_sin_llave">NO TENGO LLAVE</button>
+                            <button class="btn btn-secondary btn-selection" data-value="NO HE PROBADO" data-next-step="stepComprobarFunciona_despues_de_probar">NO HE PROBADO</button>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás</button>
+                    </div>
+                </section>
+
+                <section id="stepCuantoFalta" class="wizard-step text-center">
+                    <h2 class="mb-4">Detalle: Falta de Pago</h2>
+                    <div class="wizard-step-main-content">
+                        <h3 class="mb-3 mt-0">¿CUÁNTO FALTA POR PAGAR?</h3>
+                        <label for="cantidadFaltante" class="sr-only">Cantidad</label>
+                        <input type="number" id="cantidadFaltante" placeholder="CANTIDAD (€)" class="w-full p-3 border rounded-md mb-3 text-center" inputmode="decimal">
+                        <p id="cantidadError" class="text-danger text-xs italic mt-0 mb-2 text-center hidden">Por favor, ingrese una cantidad válida.</p>
+                        <button class="btn btn-primary btn-selection" data-action="saveCantidadFaltante" data-finalize="stepFinalizarAvisoTecnico">ENVIAR</button>
+                    </div>
+                     <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás</button>
+                    </div>
+                </section>
+
+                <section id="stepComprobarFunciona" class="wizard-step text-center">
+                    <h2 class="mb-4">Comprobación Final</h2>
+                    <div class="wizard-step-main-content">
+                        <h3 class="mb-3 mt-0">¿PODRÍA COMPROBARLO?</h3>
+                        <p class="text-gray-600 mb-3" id="comprobarContexto"></p>
+                        <div class="space-y-3 w-full">
+                            <button class="btn btn-danger btn-selection" data-value="SIGUE IGUAL" data-finalize="stepFinalizarAvisoTecnico">SIGUE IGUAL</button>
+                            <button class="btn btn-success btn-selection" data-value="YA FUNCIONA" data-finalize="stepFinalizarFunciona">YA FUNCIONA</button>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás</button>
+                    </div>
+                </section>
+
+                <section id="stepHorarioNegocio" class="wizard-step text-center">
+                    <h2 class="mb-4">Confirmar Horario del Negocio</h2>
+                    <div class="wizard-step-main-content">
+                        <p class="text-xl text-gray-700 mb-3">¿ES ESTE EL HORARIO DE SU NEGOCIO?</p>
+                        <div class="bg-gray-100 p-4 rounded-md mb-4">
+                            <p class="text-xl" id="displayHorarioNegocio">Cargando horario...</p>
+                        </div>
+                        <div class="space-y-3 w-full">
+                            <button class="btn btn-primary btn-selection" data-value="si_horario_ok" data-action="hideHorarioInputs">SÍ, HORARIO CORRECTO Y FINALIZAR</button>
+                            <button class="btn btn-secondary btn-selection" data-next-step="stepHorarioApertura" data-value="no_cambiar_horario">NO, QUIERO CAMBIARLO</button>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás (a la incidencia)</button>
+                    </div>
+                </section>
+
+                <section id="stepHorarioApertura" class="wizard-step text-center">
+                    <h2 class="mb-4">Definir Horario: Apertura</h2>
+                    <div class="wizard-step-main-content">
+                        <h3 class="mb-3 mt-0">¿A QUÉ HORA SE ABRE EL NEGOCIO?</h3>
+                        <input type="time" id="horaApertura" class="w-full p-3 border rounded-md mb-4 text-center">
+                        <button class="btn btn-primary btn-selection" data-next-step="stepHorarioCierre" data-action="saveHoraApertura">SIGUIENTE (Hora Cierre)</button>
+                    </div>
+                    <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás (a Confirmar Horario)</button>
+                    </div>
+                </section>
+
+                <section id="stepHorarioCierre" class="wizard-step text-center">
+                    <h2 class="mb-4">Definir Horario: Cierre</h2>
+                    <div class="wizard-step-main-content">
+                        <h3 class="mb-3 mt-0">¿A QUÉ HORA SE CIERRA EL NEGOCIO?</h3>
+                        <input type="time" id="horaCierre" class="w-full p-3 border rounded-md mb-4 text-center">
+                        <button class="btn btn-primary btn-selection" data-action="saveHoraCierre">GUARDAR HORARIO Y FINALIZAR</button>
+                    </div>
+                    <div class="mt-4">
+                        <button class="btn btn-back" data-action="goBack">Atrás (a Hora Apertura)</button>
+                    </div>
+                </section>
+
+            </div> 
+            
+            <section id="adminDashboardSection" class="form-screen p-4 sm:p-6">
+                
+                <nav class="bg-white shadow-md rounded-lg p-4 mb-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-center">
+                        <div class="flex-shrink-0 mb-4 sm:mb-0">
+                            <img src="https://placehold.co/150x80/0078D4/FFFFFF?text=Alzimatic" alt="Logo Alzimatic" class="h-12 rounded">
+                        </div>
+                        
+                        <div class="flex flex-wrap justify-center items-center gap-2">
+                            <button id="adminShowIncidentsBtn" class="btn btn-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" /></svg>
+                                Incidencias
+                            </button>
+                            <button id="adminNewIncidentBtn" class="btn btn-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                Nueva
+                            </button>
+                            <button id="adminModifyIncidentBtn" class="btn btn-secondary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                                Modificar
+                            </button>
+                            <button id="adminDeleteIncidentBtn" class="btn btn-danger">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                Eliminar
+                            </button>
+                             <button id="adminLogoutButton" class="btn btn-danger !bg-gray-600 hover:!bg-gray-700 !border-gray-700 ml-auto sm:ml-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                                </svg>
+                                Salir
+                            </button>
+                        </div>
+                    </div>
+                </nav>
+                
+                <div id="adminContentContainer" class="bg-gray-50 p-4 rounded-lg min-h-[60vh]">
+
+                    <div id="adminViewIncidents" class="admin-view active-admin-view">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">Listado de Incidencias</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white rounded-lg shadow">
+                                <thead class="bg-gray-200">
+                                    <tr>
+                                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Máquina</th>
+                                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Tipo</th>
+                                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fecha</th>
+                                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Estado</th>
+                                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="incidentsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="adminViewNewIncident" class="admin-view">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Crear Nueva Incidencia</h3>
+                        
+                        <form id="adminNewIncidentForm" class="space-y-6 bg-white p-6 rounded-lg shadow">
+    
+                            <fieldset class="border p-4 rounded-md">
+                                <legend class="text-lg font-semibold px-2">Datos Principales</legend>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                    <div>
+                                        <label for="adminMachineSelect" class="block text-sm font-medium text-gray-700">Máquina (*)</label>
+                                        <select id="adminMachineSelect" name="stepSeleccionaMaquina" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="">Seleccione una máquina...</option>
+                                            <option value="ROYAL CASH">ROYAL CASH</option>
+                                            <option value="SUPRA">SUPRA</option>
+                                            <option value="POWER CASH">POWER CASH</option>
+                                            <option value="MANHATAN">MANHATAN</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="adminIncidentTypeSelect" class="block text-sm font-medium text-gray-700">Tipo de Incidencia (*)</label>
+                                        <select id="adminIncidentTypeSelect" name="tipoDeIncidenciaSeleccionada" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="">Seleccione un tipo...</option>
+                                            <option value="MÁQUINA ENGANCHADA">MÁQUINA ENGANCHADA</option>
+                                            <option value="PANTALLA NO FUNCIONA">PANTALLA NO FUNCIONA</option>
+                                            <option value="BILLETE ENGANCHADO">BILLETE ENGANCHADO</option>
+                                            <option value="PASAR A RECAUDAR">PASAR A RECAUDAR</option>
+                                            <option value="SE HA QUEDADO VACIA PAGANDO UN PREMIO">SE HA QUEDADO VACIA PAGANDO UN PREMIO</option>
+                                        </select>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label for="adminUserSelect" class="block text-sm font-medium text-gray-700">Asignar Incidencia a Usuario (*)</label>
+                                        <select id="adminUserSelect" name="userId" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="">Cargando usuarios...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        
+                            <fieldset class="border p-4 rounded-md">
+                                <legend class="text-lg font-semibold px-2">Detalles del Problema</legend>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+                                    <div>
+                                        <label for="adminPantalla" class="block text-sm font-medium text-gray-700">Pantalla Afectada</label>
+                                        <select id="adminPantalla" name="step_pantalla_superior_inferior" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="">No aplica</option>
+                                            <option value="SUPERIOR">Superior</option>
+                                            <option value="INFERIOR">Inferior</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="adminMensaje" class="block text-sm font-medium text-gray-700">¿Sale algún mensaje?</label>
+                                        <select id="adminMensaje" name="step_sale_mensaje" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="">No aplica</option>
+                                            <option value="SI">Sí</option>
+                                            <option value="NO">No</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="adminAceptaBilletes" class="block text-sm font-medium text-gray-700">¿Acepta billetes?</label>
+                                        <select id="adminAceptaBilletes" name="step_acepta_billetes" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="">No aplica</option>
+                                            <option value="SI">Sí</option>
+                                            <option value="NO">No</option>
+                                            <option value="NO HE PROBADO">No he probado</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="adminCantidadFaltante" class="block text-sm font-medium text-gray-700">Cantidad faltante (€)</label>
+                                        <input type="number" id="adminCantidadFaltante" name="cantidad_faltante" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Ej: 50">
+                                    </div>
+                                </div>
+                            </fieldset>
+                        
+                            <fieldset class="border p-4 rounded-md">
+                                <legend class="text-lg font-semibold px-2">Pasos de Resolución</legend>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+                                    <div>
+                                        <label for="adminApagarEncender" class="block text-sm font-medium text-gray-700">¿Probó a apagar/encender?</label>
+                                        <select id="adminApagarEncender" name="step_apagar_encender" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="">No aplica</option>
+                                            <option value="SI, PERO SIGUE IGUAL">Sí, pero sigue igual</option>
+                                            <option value="AHORA PRUEBO">Ahora pruebo</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="adminQuitarLlave" class="block text-sm font-medium text-gray-700">¿Probó a quitar con llave?</label>
+                                        <select id="adminQuitarLlave" name="step_quitar_con_llave" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="">No aplica</option>
+                                            <option value="SI, Y NO SE QUITA">Sí, y no se quita</option>
+                                            <option value="NO HE PROBADO">No he probado</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="adminComprobar" class="block text-sm font-medium text-gray-700">Comprobación final</label>
+                                        <select id="adminComprobar" name="step_comprobar_funciona" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="">Pendiente</option>
+                                            <option value="SIGUE IGUAL">Sigue igual</option>
+                                            <option value="YA FUNCIONA">Ya funciona</option>
+                                        </select>
+                                    </div>
+                                     <div class="flex items-center pt-6">
+                                        <input id="adminSinLlave" name="sin_llave" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                        <label for="adminSinLlave" class="ml-2 block text-sm text-gray-900">Marcar si NO se tiene llave</label>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        
+                            <fieldset class="border p-4 rounded-md">
+                                <legend class="text-lg font-semibold px-2">Gestión</legend>
+                                <div>
+                                    <label for="adminStatusSelect" class="block text-sm font-medium text-gray-700">Estado de la Incidencia (*)</label>
+                                    <select id="adminStatusSelect" name="status" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        <option value="abierta" selected>Abierta</option>
+                                        <option value="en_proceso">En Proceso</option>
+                                        <option value="resuelta">Resuelta</option>
+                                    </select>
+                                </div>
+                            </fieldset>
+                        
+                            <div class="flex justify-end space-x-3 pt-4">
+                                <button type="button" id="adminCancelNewIncidentBtn" class="btn btn-secondary">Cancelar</button>
+                                <button type="submit" class="btn btn-success">Guardar Incidencia</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="adminViewModifyIncident" class="admin-view">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Modificar Incidencia</h3>
+                        <p class="text-center text-gray-500">Aquí irá el formulario para editar una incidencia seleccionada.</p>
+                    </div>
+
+                    <div id="adminViewDeleteIncident" class="admin-view">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Confirmar Eliminación</h3>
+                         <p class="text-center text-gray-500">Aquí irá el diálogo de confirmación para eliminar una incidencia.</p>
+                    </div>
+                </div>
+
+            </section>
+            
+            <section id="stepFinalizarFunciona" class="form-screen text-center">
+                </section>
+
+            <section id="stepFinalizarAvisoTecnico" class="form-screen text-center">
+                </section>
+
+            <section id="stepFinalizarTecnicoVerifica" class="form-screen text-center">
+                </section>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,568 @@
+/* Estilos generales existentes */
+
+/* Define el estado inicial de las "pantallas" y "pasos" del asistente. */
+/* Empiezan ocultos (display: none), transparentes (opacity: 0) y ligeramente desplazados (transform) para animar su entrada. */
+.auth-screen, .form-screen, .wizard-step {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* Transición suave para la animación. */
+}
+
+/* Define el estado "activo" o visible de una pantalla o paso. */
+/* Lo hace visible, opaco y lo devuelve a su posición original, creando un efecto de aparición. */
+.active-screen, .active-wizard-step {
+    display: block; /* Se cambiará a flex en la media query para móvil */
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Estilos base para los pasos del asistente (actualmente sin reglas específicas aquí). */
+.wizard-step {
+    /* padding-bottom: 1.5rem;  Movido a la media query o gestionado por flex */
+    /* margin-bottom: 1.5rem; Movido a la media query o gestionado por flex */
+}
+
+/* Estilo base para todos los botones. */
+.btn {
+    padding: 0.875rem 1.75rem; /* Relleno interior. */
+    border-radius: 12px; /* Bordes redondeados. */
+    font-weight: 600; /* Texto en negrita. */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Animación suave para los cambios de estado (hover, active). */
+    border: 2px solid transparent;
+    font-size: 1.125rem;
+    position: relative; /* Necesario para el pseudo-elemento ::before. */
+    overflow: hidden; /* Evita que el efecto de brillo se salga del botón. */
+}
+
+/* Pseudo-elemento para crear un efecto de brillo que se mueve sobre el botón. */
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%; /* Empieza fuera, a la izquierda. */
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+/* Al pasar el ratón, el brillo se desplaza hacia la derecha, cruzando el botón. */
+.btn:hover::before {
+    left: 100%;
+}
+
+/* Al pasar el ratón, el botón se eleva y agranda ligeramente, con una sombra más pronunciada. */
+.btn:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px) scale(1.02);
+}
+
+/* Al hacer clic, el botón se hunde ligeramente para dar feedback. */
+.btn:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Estilos para el botón primario (azul). */
+.btn-primary {
+    background: linear-gradient(135deg, #0078D4 0%, #005A9E 50%, #0078D4 100%);
+    background-size: 200% 200%; /* El gradiente es más grande que el botón para poder animarlo. */
+    color: white;
+    border-color: #005A9E;
+    box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
+    animation: gradientShift 3s ease infinite; /* Aplica la animación de movimiento del gradiente. */
+}
+
+/* Animación que desplaza el fondo del gradiente de un lado a otro. */
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #005A9E 0%, #004578 50%, #005A9E 100%);
+    box-shadow: 0 8px 25px rgba(0, 120, 212, 0.4);
+}
+
+/* Añade una flecha al final del texto del botón. */
+.btn-primary::after {
+    content: "→";
+    margin-left: 0.5rem;
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+/* Mueve la flecha ligeramente a la derecha al pasar el ratón. */
+.btn-primary:hover::after {
+    transform: translateX(3px);
+}
+
+/* Estilos para el botón secundario (gris claro). */
+.btn-secondary {
+    background: linear-gradient(135deg, #F3F2F1 0%, #E1DFDD 100%);
+    color: #323130;
+    border-color: #C8C6C4;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #E1DFDD 0%, #D2D0CE 100%);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para el botón de éxito (verde). */
+.btn-success {
+    background: linear-gradient(135deg, #107C10 0%, #0B5A0B 50%, #107C10 100%);
+    background-size: 200% 200%;
+    color: white;
+    border-color: #0B5A0B;
+    box-shadow: 0 4px 15px rgba(16, 124, 16, 0.3);
+    animation: gradientShift 3s ease infinite;
+}
+.btn-success:hover {
+    background: linear-gradient(135deg, #0B5A0B 0%, #084208 50%, #0B5A0B 100%);
+    box-shadow: 0 8px 25px rgba(16, 124, 16, 0.4);
+}
+
+/* Añade un tick de verificación. */
+.btn-success::after {
+    content: "✓";
+    margin-left: 0.5rem;
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+.btn-success:hover::after {
+    transform: scale(1.2); /* Agranda el tick al pasar el ratón. */
+}
+
+/* Estilos para el botón de peligro (rojo/naranja). */
+.btn-danger {
+    background: linear-gradient(135deg, #D83B01 0%, #A82F00 50%, #D83B01 100%);
+    background-size: 200% 200%;
+    color: white;
+    border-color: #A82F00;
+    box-shadow: 0 4px 15px rgba(216, 59, 1, 0.3);
+    animation: gradientShift 3s ease infinite;
+}
+.btn-danger:hover {
+    background: linear-gradient(135deg, #A82F00 0%, #8B2700 50%, #A82F00 100%);
+    box-shadow: 0 8px 25px rgba(216, 59, 1, 0.4);
+}
+
+/* Añade un icono de advertencia. */
+.btn-danger::after {
+    content: "⚠";
+    margin-left: 0.5rem;
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+.btn-danger:hover::after {
+    transform: rotate(10deg) scale(1.1); /* Rota y agranda el icono al pasar el ratón. */
+}
+
+/* Estilos para el botón de prueba local (amarillo). */
+.btn-localtest {
+    background: linear-gradient(135deg, #FFC300 0%, #FFD700 50%, #FFC300 100%);
+    background-size: 200% 200%;
+    color: #323130;
+    border-color: #E0AB00;
+    box-shadow: 0 4px 15px rgba(255, 195, 0, 0.3);
+    animation: gradientShift 3s ease infinite;
+}
+.btn-localtest:hover {
+    background: linear-gradient(135deg, #E0AB00 0%, #CC9900 50%, #E0AB00 100%);
+    box-shadow: 0 8px 25px rgba(255, 195, 0, 0.4);
+}
+
+/* Estilos para el botón de "Atrás". */
+.btn-back {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    font-size: 1rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+.btn-back:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+}
+
+/* Añade una flecha hacia atrás. */
+.btn-back::after {
+    content: "←";
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-back:hover::after {
+    transform: translateX(-3px); /* Mueve la flecha a la izquierda al pasar el ratón. */
+}
+
+/* Estilos para los botones de selección del asistente. */
+.btn-selection {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+}
+
+/* Estilos para el indicador de carga (spinner). */
+.loader {
+    border: 4px solid rgba(0, 120, 212, 0.1); /* Círculo base semi-transparente. */
+    border-top: 4px solid #0078D4; /* Segmento superior visible que girará. */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    /* Aplica 3 animaciones a la vez para un efecto más vistoso. */
+    animation: spin 1s linear infinite, pulse 2s ease-in-out infinite, rainbow 3s linear infinite;
+    margin: 20px auto;
+    display: none; /* Oculto por defecto. */
+}
+
+/* Animación de giro. */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Animación de pulso (crece y decrece). */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Animación que cambia el color del segmento superior del spinner. */
+@keyframes rainbow {
+    0% { border-top-color: #0078D4; }
+    25% { border-top-color: #107C10; }
+    50% { border-top-color: #FFC300; }
+    75% { border-top-color: #D83B01; }
+    100% { border-top-color: #0078D4; }
+}
+
+/* Estilos para el banner que indica el modo de prueba local. */
+#localModeBanner {
+    display: none;
+    background: linear-gradient(135deg, #FFC300 0%, #FFD700 100%);
+    color: #323130;
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    border: 2px solid #E0AB00;
+    box-shadow: 0 4px 15px rgba(255, 195, 0, 0.3);
+    animation: glow 2s ease-in-out infinite alternate; /* Animación de brillo. */
+}
+
+/* Animación de brillo para el banner local. */
+@keyframes glow {
+    from { box-shadow: 0 4px 15px rgba(255, 195, 0, 0.3); }
+    to { box-shadow: 0 6px 20px rgba(255, 195, 0, 0.6); }
+}
+
+/* Estilos base de tipografía. */
+body {
+    font-size: 1.125rem;
+}
+
+h1 {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    /* Truco para crear texto con fondo de gradiente. */
+    background: linear-gradient(135deg, #0078D4, #005A9E);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+h2 {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+    background: linear-gradient(135deg, #323130, #605e5c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: titlePulse 3s ease-in-out infinite; /* Animación de pulso para los títulos. */
+}
+
+@keyframes titlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+h3 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    color: #323130;
+}
+
+/* Estilos para los campos de entrada de datos. */
+input[type="email"], input[type="password"], input[type="time"], input[type="number"] {
+    font-size: 1.125rem;
+    padding: 0.875rem 1rem;
+    border: 2px solid #E1DFDD;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+/* Estilo para un campo de entrada cuando tiene el foco. */
+input:focus {
+    border-color: #0078D4;
+    box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.2); /* Resplandor exterior. */
+    transform: scale(1.02);
+    outline: none;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+}
+
+/* Estilo para un campo de entrada con error. */
+input.border-red-500 {
+    border-color: #D83B01 !important;
+    box-shadow: 0 0 0 4px rgba(216, 59, 1, 0.2) !important;
+    animation: shake 0.5s ease-in-out; /* Animación de temblor. */
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #323130;
+}
+
+/* Estilos para la Barra de Progreso. */
+#progressBar {
+    background: linear-gradient(90deg, #0078D4 0%, #00BCF2 50%, #107C10 100%);
+    background-size: 200% 100%;
+    box-shadow: 0 2px 8px rgba(0, 120, 212, 0.4);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: progressGlow 2s ease-in-out infinite alternate;
+}
+
+/* Animación de brillo y movimiento para la barra de progreso. */
+@keyframes progressGlow {
+    from {
+        box-shadow: 0 2px 8px rgba(0, 120, 212, 0.4);
+        background-position: 0% 50%;
+    }
+    to {
+        box-shadow: 0 4px 15px rgba(0, 120, 212, 0.6);
+        background-position: 100% 50%;
+    }
+}
+
+#progressBarContainer {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Animaciones para mensajes de error. */
+@keyframes slideInBounce {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.8);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(5px) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Aplica la animación cuando un párrafo de error no está vacío/oculto. */
+#loginError:not(:empty), #registerError:not(:empty), #cantidadError:not(.hidden) {
+    animation: slideInBounce 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    padding: 0.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #D83B01;
+}
+
+/* --- INICIO: Estilos para dispositivos móviles --- */
+/* Media query que se aplica solo si el ancho de la pantalla es de 639px o menos. */
+@media (max-width: 639px) {
+    body {
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Hace que los contenedores principales ocupen el 100% de la pantalla. */
+    .container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    #appContainer {
+        width: 100%;
+        flex-grow: 1;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Ajustes de espaciado y tamaño para el encabezado en móvil. */
+    #appHeader {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    #appHeader h1 {
+        font-size: 1.375rem;
+    }
+
+    #localModeBanner {
+        margin-left: 1rem;
+        margin-right: 1rem;
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Ajusta la barra de progreso para que sea más delgada en móvil. */
+    #progressBarContainer {
+        height: 0.75rem;
+        margin-left: 1rem;
+        margin-right: 1rem;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+        width: auto;
+        box-sizing: border-box;
+    }
+
+    #progressBar {
+        height: 0.75rem;
+        line-height: 0.75rem;
+        font-size: 0.625rem;
+    }
+
+    /* En móvil, las pantallas activas usan flexbox para un mejor control del layout vertical. */
+    .auth-screen.active-screen,
+    .form-screen.active-screen,
+    .wizard-step.active-wizard-step {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        padding: 1rem;
+        overflow-y: auto;
+    }
+
+    /* Ajustes para las pantallas de login y registro. */
+    #loginSection.active-screen,
+    #registerSection.active-screen {
+        justify-content: space-around; /* Ajustado para mejor distribución */
+        align-items: center;
+    }
+
+    /* Reduce el tamaño del logo en móvil. */
+    #loginSection.active-screen img,
+    #registerSection.active-screen img {
+        max-height: 60px; /* Reducido para más espacio */
+        margin-bottom: 0.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Y así sucesivamente, se ajustan tamaños de fuente, márgenes y paddings para móvil... */
+
+    /* Animación de rebote para los iconos en las pantallas finales. */
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+}
+/* --- FIN: Estilos para dispositivos móviles --- */
+
+/* Mejoras adicionales para desktop (pantallas de 640px o más). */
+@media (min-width: 640px) {
+    #appContainer {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Sombra más pronunciada. */
+        border-radius: 20px; /* Bordes más redondeados. */
+        overflow: hidden; /* Asegura que el contenido respete los bordes redondeados. */
+    }
+
+    /* Animación de entrada desde la derecha para los pasos del asistente en escritorio. */
+    .wizard-step.active-wizard-step {
+        animation: slideInFromRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideInFromRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+}
+/* --- INICIO: Estilos para el modo Administrador a pantalla completa --- */
+/* Estos estilos se aplican cuando el body tiene la clase 'admin-mode'. */
+body.admin-mode {
+    /* Anula el centrado del body para que el panel de admin empiece arriba. */
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+body.admin-mode .container {
+    /* El contenedor ocupa todo el ancho sin límite. */
+    max-width: 100%;
+    padding: 0;
+}
+
+body.admin-mode #appContainer {
+    /* El contenedor de la app se fusiona con la pantalla. */
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    min-height: 100vh; /* Ocupa al menos toda la altura de la ventana. */
+}
+
+body.admin-mode #adminDashboardSection {
+    /* Añade un padding interno a la sección del admin para que el contenido no pegue a los bordes. */
+    padding: 1.5rem; /* 24px */
+}
+
+/* Oculta el encabezado y la barra de progreso general en modo admin. */
+body.admin-mode #appHeader,
+body.admin-mode #progressBarContainer {
+    display: none;
+}
+
+/* --- FIN: Estilos para el modo Administrador --- */
+
+
+/* --- CÓDIGO AÑADIDO PARA LA FUNCIONALIDAD DEL PANEL DE ADMIN --- */
+/* Este código NO cambia el estilo visual, solo permite ocultar y mostrar las secciones. */
+
+/* Oculta todas las vistas del panel de admin por defecto */
+.admin-view {
+    display: none;
+}
+/* Muestra solo la vista que tiene la clase 'active-admin-view' */
+.admin-view.active-admin-view {
+    display: block;
+}
